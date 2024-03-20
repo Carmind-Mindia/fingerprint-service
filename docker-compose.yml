@@ -1,0 +1,16 @@
+version: '3'
+services:
+    olimpo-gym:
+      image: fonzeca/olimpo-gym:dev
+      # ports:
+      #   - 5623:5623
+      networks:
+        - olimpo
+      env_file:
+        - .env
+
+networks:
+  olimpo:
+    driver: bridge
+    name: olimpo
+    external: true
