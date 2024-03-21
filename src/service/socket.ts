@@ -49,10 +49,6 @@ export function createServerSocket(httpServer: http.Server){
             });
         });
     });
-
-    
-    // Start the Socket.IO server
-    socketServer.listen(port);
 }
 
 
