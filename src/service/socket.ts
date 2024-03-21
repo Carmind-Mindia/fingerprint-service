@@ -15,9 +15,12 @@ export function createServerSocket(httpServer: http.Server){
     socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {path: '/fingerprint-service/ws'});
     
     
-    const port = Number(process.env.SOCKER_PORT) || 3000;
+
+    console.log(`Socket server listening`)
 
     socketServer.on('connection', (socket: Socket) => {
+        console.log(`New connection: ${socket.id}`);
+
         const apikey = socket.handshake.auth.apiKey;
         if(apikey === process.env.API_KEY){
             socket.data.apiKey = apikey;
