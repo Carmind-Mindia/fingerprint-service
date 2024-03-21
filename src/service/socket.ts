@@ -52,6 +52,8 @@ export function createServerSocket(httpServer: http.Server){
             });
         });
     });
+
+    socketServer.listen(httpServer);
 }
 
 
