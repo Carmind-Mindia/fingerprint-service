@@ -1,14 +1,16 @@
-import { Elysia } from "elysia";
 
 // Import the connection file to start the connection
+import express from "express";
 import "./mongodb/connection";
-import "./service/socket";
+import { createServerSocket } from "./service/socket";
 
-const app = new Elysia()
-    .get("/ping", () => "pong");
+const app = express();
 
-app.listen(Bun.env.PORT || 3000);
+const port = process.env.PORT || 3000;
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+// Add your routes and middleware here
+const server = app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
+createServerSocket(server);

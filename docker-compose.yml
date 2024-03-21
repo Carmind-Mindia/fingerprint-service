@@ -1,7 +1,7 @@
 version: '3'
 services:
     olimpo-gym:
-      image: fonzeca/olimpo-gym:dev
+      image: fonzeca/fingerprint-service:dev
       # ports:
       #   - 5623:5623
       networks:
