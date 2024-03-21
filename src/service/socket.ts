@@ -40,6 +40,7 @@ export function createServerSocket(httpServer: http.Server){
         }
 
         socket.on('ping', () => {
+            socket.emit('pong');
             return 'pong';
         });
     
