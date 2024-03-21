@@ -12,7 +12,7 @@ export enum RoomsInSocket{
 
 export function createServerSocket(httpServer: http.Server){
     
-    socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {path: '/fingerprint-service/ws/'});
+    socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {path: '/ws'});
     
     
 
