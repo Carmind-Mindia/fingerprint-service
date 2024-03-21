@@ -7,6 +7,7 @@ export enum ProducerState { Active = "active", NotFound = "not_found" }
 
 export interface ClientToServerEvents {
     notifyFingerprint(dni: string, nombre: string, template: string, fingerIndex: number): void
+    ping: () => string
 }
 
 export interface InterServerEvents {

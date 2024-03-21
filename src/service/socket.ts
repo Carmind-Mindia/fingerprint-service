@@ -35,7 +35,10 @@ export function createServerSocket(httpServer: http.Server){
                 socket.emit('producerState', producerState);
             });
         }
-    
+
+        socket.on('ping', () => {
+            return 'pong';
+        });
     
         socket.on('disconnect', () => {
     
