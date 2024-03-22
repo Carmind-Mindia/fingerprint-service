@@ -21,7 +21,7 @@ export function createServerSocket(httpServer: http.Server){
     socketServer.on('connection', (socket: Socket) => {
         console.log(`New connection: ${socket.id}`);
 
-        const apikey = socket.handshake.auth.apiKey;
+        const apikey = socket.request.headers['x-api-key'];
         if(apikey === process.env.API_KEY){
             socket.data.apiKey = apikey;
             socket.join(RoomsInSocket.Producers);
@@ -39,10 +39,6 @@ export function createServerSocket(httpServer: http.Server){
             });
         }
 
-        socket.on('ping', () => {
-            socket.emit('pong');
-            return 'pong';
-        });
     
         socket.on('disconnect', () => {
     
@@ -53,8 +49,6 @@ export function createServerSocket(httpServer: http.Server){
             });
         });
     });
-
-    socketServer.listen(httpServer);
 }
 
 
