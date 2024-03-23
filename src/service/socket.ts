@@ -29,27 +29,30 @@ export function createServerSocket(httpServer: http.Server){
             socket.on('notifyFingerprint', (dni: string, nombre: string, template: string, fingerIndex: number) => {
                 FingerprintController.onNewFingerprintVerfiy(dni, nombre, fingerIndex, template);
             });
+            notifyProducerState(socket);
         }else{
             socket.join(RoomsInSocket.Consumers);
     
             // Notify the consumer about the producer state
-            socketServer.to(RoomsInSocket.Producers).fetchSockets().then((sockets) => {
-                const producerState = sockets.length > 0 ? ProducerState.Active : ProducerState.NotFound;
-                socket.emit('producerState', producerState);
-            });
+            notifyProducerState(socket);
         }
 
     
         socket.on('disconnect', () => {
+            console.log(`Disconnected: ${socket.id}`);
+            
     
             // Check if the producer has disconnected
-            socketServer.in(RoomsInSocket.Producers).fetchSockets().then((sockets) => {
-                const producerState = sockets.length > 0 ? ProducerState.Active : ProducerState.NotFound;
-                socket.in(RoomsInSocket.Consumers).emit('producerState', producerState);
-            });
+            notifyProducerState(socket);
         });
     });
 }
 
 
+function notifyProducerState(socket: Socket) {
+    socketServer.to(RoomsInSocket.Producers).fetchSockets().then((sockets) => {
+        const producerState = sockets.length > 0 ? ProducerState.Active : ProducerState.NotFound;
+        socket.to(RoomsInSocket.Consumers).emit('producerState', producerState);
+    });
+}
 
