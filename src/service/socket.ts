@@ -14,7 +14,12 @@ export enum RoomsInSocket{
 
 export function createServerSocket(httpServer: http.Server){
     
-    socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {path: '/ws'});
+    socketServer = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>(httpServer, {path: '/ws', cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type', 'Authorization ', 'Origin', 'x-api-key']
+    }});
+
     
     
 

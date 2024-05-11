@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "@sinclair/typebox": "^0.32.13",
+    "cors": "^2.8.5",
     "elysia": "latest",
     "express": "^4.19.1",
     "mongoose": "^8.1.1",

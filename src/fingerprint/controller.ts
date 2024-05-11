@@ -18,19 +18,28 @@ export async function updateOrCreateFingerprint(dni: string, fingerIndex: number
 	// Buscar si el fingerprint ya existe
 	var finger = fpuser.fingerprints.find(f => f.fingerIndex === fingerIndex);
 
-	if(finger && finger.template !== fingerData){
-		finger.template = fingerData;
-		return;
+	if(finger){
+		if(finger.template !== fingerData){
+			finger.template = fingerData;
+			console.log(`Updated fingerprint: ${dni} - ${fingerIndex}`);
+		} else {
+			console.log(`Fingerprint already exists: ${dni} - ${fingerIndex}`);
+		}
 	}
 
-	await fpuser.save();
+	if(!finger){
+		fpuser.fingerprints.push({fingerIndex, template: fingerData});
+		console.log(`New fingerprint: ${dni} - ${fingerIndex}`);
+	}
+		
 
+	await fpuser.save();
 	return;
 }
 
 export async function onNewFingerprintVerfiy(dni: string, nombre: string, fingerIndex: number, fingerData: string) {
 	await updateOrCreateFingerprint(dni, fingerIndex, fingerData);
-
+	
 	socketServer.in(RoomsInSocket.Consumers).emit('fingerPrintReaded', dni, nombre);
 }
 

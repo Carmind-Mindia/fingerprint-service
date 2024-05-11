@@ -7,7 +7,9 @@ export async function createOrUpdateFPUser(dni: string, name: string, lastName: 
 	if(fpUser){
 		fpUser.name = name;
 		fpUser.lastName = lastName;
+		fpUser.active = true;
 		await fpUser.save();
+		console.log(`Updated user: ${dni}`);
 		return;
 	}
 
@@ -18,13 +20,16 @@ export async function createOrUpdateFPUser(dni: string, name: string, lastName: 
 	});
 
 	await fpUser.save();
+	console.log(`New user: ${dni}`);
 }
 
 // Función para eliminar un FPUser
 export async function deleteFPUser(dni: string) {
 	//Put active to false
 	const updated = await FPUser.findOneAndUpdate({dni}, {active: false});
-	return !!updated;
+	console.log(`Deleted user: ${dni}`);
+	
+	return true;
 }
 
 
