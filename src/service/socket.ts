@@ -1,7 +1,9 @@
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import * as FingerprintController from "../fingerprint/controller";
-import { ProducerState, type ClientToServerEvents, type InterServerEvents, type ServerToClientEvents, type SocketData } from './socket.types';
+import * as FPUserController from "../fpuser/controller";
+import type { IFP_User } from '../fpuser/model';
+import { ProducerState, type ClientToServerEvents, type FPNotify, type InterServerEvents, type ServerToClientEvents, type SocketData } from './socket.types';
 
 export var socketServer: Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
@@ -18,17 +20,34 @@ export function createServerSocket(httpServer: http.Server){
 
     console.log(`Socket server listening`)
 
-    socketServer.on('connection', (socket: Socket) => {
+    socketServer.on('connection', (socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>) => {
         console.log(`New connection: ${socket.id}`);
 
         const apikey = socket.request.headers['x-api-key'];
         if(apikey === process.env.API_KEY){
-            socket.data.apiKey = apikey;
+
+            socket.data.apiKey = apikey ?? "";
             socket.join(RoomsInSocket.Producers);
     
-            socket.on('notifyFingerprint', (dni: string, nombre: string, template: string, fingerIndex: number) => {
-                FingerprintController.onNewFingerprintVerfiy(dni, nombre, fingerIndex, template);
+            socket.on('notifyFingerprint', async (request: FPNotify) => {
+                FingerprintController.onNewFingerprintVerfiy(request.dni, request.nombre, request.fingerIndex, request.template);
             });
+
+            socket.on('deleteuser', async (dni: string, callback: (deleted: boolean) => void) => {
+                const deleted = await FPUserController.deleteFPUser(dni);
+                callback(deleted);
+            });
+
+            socket.on('syncUsers', async (users: Array<IFP_User>, callback: (deleteUsers: Array<IFP_User>) => void) => {
+                const deleteUsers = await FPUserController.syncUsers(users);
+                callback(deleteUsers);
+            });
+
+            socket.on('updateOrCreateuser', async (fpUser: IFP_User, callback: (updated: boolean) => void) => {
+                await FPUserController.createOrUpdateFPUser(fpUser.dni, fpUser.name, fpUser.lastName);
+                callback(true);
+            });
+
             notifyProducerState(socket);
         }else{
             socket.join(RoomsInSocket.Consumers);
@@ -37,11 +56,13 @@ export function createServerSocket(httpServer: http.Server){
             notifyProducerState(socket);
         }
 
-    
+        socket.on('ping', (callback: (pong: string) => void) => {
+            callback('pong');
+        });
+
         socket.on('disconnect', () => {
             console.log(`Disconnected: ${socket.id}`);
             
-    
             // Check if the producer has disconnected
             notifyProducerState(socket);
         });

@@ -1,26 +1,29 @@
+import { FPUser } from "../fpuser/model";
 import { RoomsInSocket, socketServer } from "../service/socket";
-import { Fingerprint } from "./model";
 
 // Función para dar de alta un subscriptor
 export async function updateOrCreateFingerprint(dni: string, fingerIndex: number, fingerData: string) {
 
-	var finger = await Fingerprint.findOne({dni, template: fingerData});
+	var fpuser = await FPUser.findOne({dni});
 
-	if(finger){
-		finger.lastDateVerified = new Date();
-		await finger.save();
+	if(!fpuser){
+		// TODO: Enviar un mensaje de error
 		return;
 	}
 
-	// Crear un nuevo documento de fingerprint
-	finger = new Fingerprint({
-		dni,
-		template: fingerData,
-		fingerIndex,
-		lastDateVerified: new Date()
-	})
+	fpuser.lastDateVerified = new Date();
 
-	await finger.save()
+	fpuser.fingerprints = fpuser.fingerprints || [];
+
+	// Buscar si el fingerprint ya existe
+	var finger = fpuser.fingerprints.find(f => f.fingerIndex === fingerIndex);
+
+	if(finger && finger.template !== fingerData){
+		finger.template = fingerData;
+		return;
+	}
+
+	await fpuser.save();
 
 	return;
 }
