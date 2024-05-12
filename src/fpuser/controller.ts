@@ -46,9 +46,9 @@ export async function syncUsers(users: IFP_User[]) : Promise<IFP_User[]> {
 	const dbUsers = await FPUser.find();
 
 	// Obtenemos los usuarios que han sido eliminados en el servidor
-	const deletedOnServer = dbUsers.filter(u => !users.find(usr => usr.dni === u.dni));
+	const deletedOnServer = dbUsers.filter(u => !users.find(usr => usr.dni === u.dni) && u.active);
 
-	users.filter(u => dbUsers.find(usr => usr.dni === u.dni)).forEach(u => {
+	users.filter(u => !dbUsers.find(usr => usr.dni === u.dni)).forEach(u => {
 		createOrUpdateFPUser(u.dni, u.name, u.lastName);
 	});
 
