@@ -34,7 +34,7 @@ export async function deleteFPUser(dni: string) {
 }
 
 export async function getAllUsers() : Promise<IFP_User[]> {
-	const users = await FPUser.find({active: true});
+	const users = await FPUser.find({active: true}, {fingerprints: 0, loginId: 0, active: 0});
 	return users;
 }
 
@@ -51,6 +51,8 @@ export async function syncUsers(users: IFP_User[]) : Promise<IFP_User[]> {
 	users.filter(u => dbUsers.find(usr => usr.dni === u.dni)).forEach(u => {
 		createOrUpdateFPUser(u.dni, u.name, u.lastName);
 	});
+
+	// TODO: Sincronizar bien cuando el cliente de java no esta conectado
 	
 	return deletedOnServer;
 }
