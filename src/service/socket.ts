@@ -61,13 +61,17 @@ export function createServerSocket(httpServer: http.Server){
         });
 
         socket.on('updateOrCreateuser', async (fpUser: IFP_User, callback: (updated: boolean) => void) => {
-            await FPUserController.createOrUpdateFPUser(fpUser.dni, fpUser.name, fpUser.lastName);
+            const newuser = await FPUserController.createOrUpdateFPUser(fpUser.dni, fpUser.name, fpUser.lastName);
             callback(true);
+            socket.broadcast.emit('reSync');
         });
 
         socket.on('deleteuser', async (dni: string, callback: (deleted: boolean) => void) => {
             const deleted = await FPUserController.deleteFPUser(dni);
             callback(deleted);
+            if(deleted) {
+                socket.broadcast.emit('reSync');
+            }
         });
 
 

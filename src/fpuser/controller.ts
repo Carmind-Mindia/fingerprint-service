@@ -21,6 +21,7 @@ export async function createOrUpdateFPUser(dni: string, name: string, lastName: 
 
 	await fpUser.save();
 	console.log(`New user: ${dni}`);
+	return fpUser;
 }
 
 // Función para eliminar un FPUser
@@ -39,5 +40,17 @@ export async function getAllUsers() : Promise<IFP_User[]> {
 
 
 export async function syncUsers(users: IFP_User[]) : Promise<IFP_User[]> {
-    throw new Error('Function not implemented.');
+	console.log(users);
+	
+	// Obtenemos todos los usuarios activos
+	const dbUsers = await FPUser.find();
+
+	// Obtenemos los usuarios que han sido eliminados en el servidor
+	const deletedOnServer = dbUsers.filter(u => !users.find(usr => usr.dni === u.dni));
+
+	users.filter(u => dbUsers.find(usr => usr.dni === u.dni)).forEach(u => {
+		createOrUpdateFPUser(u.dni, u.name, u.lastName);
+	});
+	
+	return deletedOnServer;
 }

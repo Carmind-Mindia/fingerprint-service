@@ -4,13 +4,14 @@ import type { IFP_User } from "../fpuser/model";
 export interface ServerToClientEvents {
 	fingerPrintReaded: (dni: string, nombre: string) => void
     producerState: (state: ProducerState) => void
+    reSync:() => void
 }
 
 export interface ClientToServerEvents {
     notifyFingerprint(request: FPNotify): void;
     
     syncUsers(users: Array<IFP_User>, callback: (deleteUsers: Array<IFP_User>) => void): void;
-    
+
     updateOrCreateuser(fpUser: IFP_User, callback: (updated: boolean) => void): void;
     deleteuser(dni: string, callback: (deleted: boolean) => void): void;
     getAllUsers(callback: (users: Array<IFP_User>) => void): void;
