@@ -32,6 +32,10 @@ export async function deleteFPUser(dni: string) {
 	return true;
 }
 
+export async function getAllUsers() : Promise<IFP_User[]> {
+	const users = await FPUser.find({active: true});
+	return users;
+}
 
 
 export async function syncUsers(users: IFP_User[]) : Promise<IFP_User[]> {

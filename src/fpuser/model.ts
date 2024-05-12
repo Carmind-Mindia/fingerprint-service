@@ -12,6 +12,7 @@ const TFP_User = Type.Object({
         fingerIndex: Type.Number()
     }))),
     lastDateVerified: Type.Optional(Type.Date()),
+    loginId: Type.Optional(Type.String()),
     active: Type.Optional(Type.Boolean({default: true}))
 })
 
@@ -26,6 +27,7 @@ const FPUserSchema = new Schema<IFP_User>({
         fingerIndex: { type: Number, required: true }
     }],
     lastDateVerified: { type: Date, required: false },
+    loginId: { type: String, required: false },
     active: { type: Boolean, required: true, default: true }
 }, {
     versionKey: false

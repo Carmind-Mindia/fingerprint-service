@@ -38,25 +38,20 @@ export function createServerSocket(httpServer: http.Server){
                 FingerprintController.onNewFingerprintVerfiy(request.dni, request.nombre, request.fingerIndex, request.template);
             });
 
-            socket.on('deleteuser', async (dni: string, callback: (deleted: boolean) => void) => {
-                const deleted = await FPUserController.deleteFPUser(dni);
-                callback(deleted);
-            });
-
             socket.on('syncUsers', async (users: Array<IFP_User>, callback: (deleteUsers: Array<IFP_User>) => void) => {
                 const deleteUsers = await FPUserController.syncUsers(users);
                 callback(deleteUsers);
-            });
-
-            socket.on('updateOrCreateuser', async (fpUser: IFP_User, callback: (updated: boolean) => void) => {
-                await FPUserController.createOrUpdateFPUser(fpUser.dni, fpUser.name, fpUser.lastName);
-                callback(true);
             });
 
             notifyProducerState(socket);
         }else{
             socket.join(RoomsInSocket.Consumers);
     
+            socket.on('getAllUsers', async (callback: (users: Array<IFP_User>) => void) => {
+                const users = await FPUserController.getAllUsers();
+                callback(users);
+            });
+
             // Notify the consumer about the producer state
             notifyProducerState(socket);
         }
@@ -64,6 +59,18 @@ export function createServerSocket(httpServer: http.Server){
         socket.on('ping', (callback: (pong: string) => void) => {
             callback('pong');
         });
+
+        socket.on('updateOrCreateuser', async (fpUser: IFP_User, callback: (updated: boolean) => void) => {
+            await FPUserController.createOrUpdateFPUser(fpUser.dni, fpUser.name, fpUser.lastName);
+            callback(true);
+        });
+
+        socket.on('deleteuser', async (dni: string, callback: (deleted: boolean) => void) => {
+            const deleted = await FPUserController.deleteFPUser(dni);
+            callback(deleted);
+        });
+
+
 
         socket.on('disconnect', () => {
             console.log(`Disconnected: ${socket.id}`);

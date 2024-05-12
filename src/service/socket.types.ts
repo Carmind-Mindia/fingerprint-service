@@ -9,10 +9,11 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
     notifyFingerprint(request: FPNotify): void;
     
+    syncUsers(users: Array<IFP_User>, callback: (deleteUsers: Array<IFP_User>) => void): void;
+    
     updateOrCreateuser(fpUser: IFP_User, callback: (updated: boolean) => void): void;
     deleteuser(dni: string, callback: (deleted: boolean) => void): void;
-    
-    syncUsers(users: Array<IFP_User>, callback: (deleteUsers: Array<IFP_User>) => void): void;
+    getAllUsers(callback: (users: Array<IFP_User>) => void): void;
     
     ping(callback: (pong: string) => void): void;
 }
